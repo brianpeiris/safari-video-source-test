@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+	<style>body { font-family: sans-serif; }button, span, video { display: block } #license { font-size: 8pt; color: lightgrey; margin-top: 0.2em; }</style>
+  </head>
+  <body>
+    <button id="connectBtn">Connect to AudioContext</button>
+	<div>video time: <span id="currTime">0</span></div>
+	<div>context time: <span id="ctxTime">0</span></div>
+    <video id="videoEl" src="sync.mp4" width="400px"></video>
+	<span id="license">Video by Oshan Ruiz (https://www.youtube.com/watch?v=s_PbyRpKrRk)</span>
+
+    <script>
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      audioCtx.suspend();
+
+      videoEl.controls = true;
+      videoEl.oncanplaythrough = function() {
+        reportTime();
+      };
+      videoEl.onplay = function() {
+        audioCtx.resume();
+      };
+
+      function reportTime() {
+        currTime.innerText = videoEl.currentTime.toFixed(3);
+        ctxTime.innerText = audioCtx.currentTime.toFixed(3);
+        requestAnimationFrame(reportTime);
+      }
+
+      connectBtn.onclick = function() {
+        const source = audioCtx.createMediaElementSource(videoEl);
+        source.connect(audioCtx.destination);
+        connectBtn.innerText = "Done!";
+      };
+    </script>
+  </body>
+</html>
